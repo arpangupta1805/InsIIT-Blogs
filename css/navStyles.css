@@ -1,0 +1,8 @@
+#rightBox {
+	display: flex;
+	justify-content: space between;
+}
+
+
+@media (screen orientation: portrait) {
+}
