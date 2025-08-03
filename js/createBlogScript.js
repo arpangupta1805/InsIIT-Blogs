@@ -24,11 +24,21 @@ form.addEventListener('submit', async (event) => {
 	const author = auth.currentUser.displayName
 	try {
 		const docRef = await addDoc(collection(firestore, "blogs"), {
-			title, subline, body, author
+				title, 
+			subline, 
+			body, 
+			author,
+			authorEmail: auth.currentUser.email, // Store author's email for security
+			createdAt: new Date().toISOString() // Add timestamp for sorting/filtering
 		})
 
 		const indexRef = await addDoc(collection(firestore, "blogsRef"), {
-			title, subline, author, blogId: docRef.id
+			title, 
+			subline, 
+			author, 
+			authorEmail: auth.currentUser.email,
+			blogId: docRef.id,
+			createdAt: new Date().toISOString()
 		})
 		
 
