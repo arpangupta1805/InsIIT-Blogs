@@ -9,21 +9,87 @@
 }
 
 .blog {
-	width: 20ch;
-	min-height: 1rem;
-	max-height: 5rem;
-	border-radius: 0.5rem;
-	margin: 1rem;
-
+    width: 250px;
+    height: 250px;
+    border-radius: 0.5rem;
+    margin: 0.75rem;
+    padding: 1rem;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    transform: translateZ(0);
+    will-change: transform, box-shadow;
+    position: relative;
+    overflow: hidden;
 }
 
 .blog:hover {
-	box-shadow: 2px blue;
+    transform: scale(1.02) translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Ensure smooth transitions for child elements */
+.blog * {
+    transition: inherit;
+}
+
+/* Add a subtle overlay on hover */
+.blog::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.01);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    pointer-events: none;
+}
+
+.blog:hover::after {
+    opacity: 1;
+}
+
+.blog-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.blog h3 {
+    margin: 0.5rem 0 0.3rem;
+    font-size: 1rem;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 0.2rem;
+}
+
+.blog p {
+    margin: 0.2rem 0;
+    color: #666;
+    font-size: 0.85rem;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex-grow: 1;
+    padding: 0 0.2rem;
 }
 
 .blogImage {
-	width: 100%;
-	max-height: 100%;
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 0.25rem;
+    margin-bottom: 0.5rem;
 }
 
 .read-more {
