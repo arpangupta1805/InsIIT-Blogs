@@ -97,9 +97,18 @@ async function loadBlog() {
       
       // Update blog content
       blogTitle.textContent = blogData.title || 'Untitled'
-      subline.textContent = blogData.subline || ''
+      subline.textContent = blogData.subtitle || ''
       author.textContent = `By ${blogData.author || 'Unknown Author'}`
-      body.textContent = blogData.body || ''
+      
+      // Parse and display blog content
+      const contentType = blogData.contentType || 'html';
+      if (contentType === 'markdown' && window.MarkdownParser) {
+        const parser = new MarkdownParser();
+        body.innerHTML = parser.parse(blogData.body || '');
+      } else {
+        // Fallback for older HTML content or if parser fails
+        body.innerHTML = blogData.body || '';
+      }
       
       // Format and display date
       if (blogData.createdAt) {

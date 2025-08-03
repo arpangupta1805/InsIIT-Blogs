@@ -154,9 +154,10 @@
 	display: flex;
 	align-items: center;
 	gap: 5px;
-	padding: 10px 15px;
+	padding: 12px 15px;
 	background: #f8f9fa;
 	border-bottom: 1px solid #e1e5e9;
+	flex-wrap: wrap;
 }
 
 .toolbar-btn {
@@ -169,11 +170,13 @@
 	transition: all 0.2s ease;
 	min-width: 35px;
 	text-align: center;
+	font-family: inherit;
 }
 
 .toolbar-btn:hover {
 	background: #e9ecef;
 	border-color: #adb5bd;
+	transform: translateY(-1px);
 }
 
 .toolbar-btn.active {
@@ -186,24 +189,119 @@
 	width: 1px;
 	height: 25px;
 	background: #ddd;
-	margin: 0 5px;
+	margin: 0 8px;
 }
 
 .blog-editor {
 	min-height: 500px;
 	padding: 20px;
 	font-size: 1.1rem;
-	line-height: 1.6;
+	line-height: 1.7;
 	color: #333;
 	outline: none;
 	border: none;
 	resize: none;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	white-space: pre-wrap;
+	word-wrap: break-word;
 }
 
 .blog-editor:empty:before {
 	content: attr(placeholder);
 	color: #adb5bd;
 	font-style: italic;
+}
+
+/* Markdown Dialog Styles */
+.md-dialog {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1000;
+}
+
+.md-dialog-content {
+	background: white;
+	padding: 30px;
+	border-radius: 12px;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+	max-width: 500px;
+	width: 90%;
+}
+
+.md-dialog-content h3 {
+	margin: 0 0 20px 0;
+	color: #333;
+	font-size: 1.4rem;
+}
+
+.md-dialog-content .form-group {
+	margin-bottom: 15px;
+}
+
+.md-dialog-content label {
+	display: block;
+	font-weight: 600;
+	color: #333;
+	margin-bottom: 5px;
+}
+
+.md-dialog-content input {
+	width: 100%;
+	padding: 10px 12px;
+	border: 2px solid #e1e5e9;
+	border-radius: 6px;
+	font-size: 1rem;
+	transition: border-color 0.3s ease;
+}
+
+.md-dialog-content input:focus {
+	outline: none;
+	border-color: #007bff;
+	box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.dialog-actions {
+	display: flex;
+	gap: 10px;
+	justify-content: flex-end;
+	margin-top: 20px;
+}
+
+.btn-cancel {
+	background: #6c757d;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 0.9rem;
+	transition: background-color 0.3s ease;
+}
+
+.btn-cancel:hover {
+	background: #5a6268;
+}
+
+.btn-insert {
+	background: #007bff;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 0.9rem;
+	transition: background-color 0.3s ease;
+}
+
+.btn-insert:hover {
+	background: #0056b3;
 }
 
 .blog-editor h2,
@@ -270,6 +368,12 @@
 	.editor-toolbar {
 		flex-wrap: wrap;
 		gap: 8px;
+		padding: 10px;
+	}
+	
+	.toolbar-btn {
+		min-width: 40px;
+		padding: 10px;
 	}
 	
 	.editor-actions {
@@ -280,6 +384,44 @@
 	.publish-btn {
 		width: 200px;
 	}
+	
+	.md-dialog-content {
+		padding: 20px;
+		margin: 20px;
+	}
+	
+	.dialog-actions {
+		flex-direction: column;
+		gap: 8px;
+	}
+	
+	.btn-cancel,
+	.btn-insert {
+		width: 100%;
+	}
+}
+
+/* Markdown Editor Specific Styles */
+.markdown-textarea {
+	font-family: 'Segoe UI', 'Monaco', 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace !important;
+}
+
+.markdown-textarea::-webkit-scrollbar {
+	width: 8px;
+}
+
+.markdown-textarea::-webkit-scrollbar-track {
+	background: #f1f1f1;
+	border-radius: 4px;
+}
+
+.markdown-textarea::-webkit-scrollbar-thumb {
+	background: #c1c1c1;
+	border-radius: 4px;
+}
+
+.markdown-textarea::-webkit-scrollbar-thumb:hover {
+	background: #a8a8a8;
 }
 
 #createBlogForm {
