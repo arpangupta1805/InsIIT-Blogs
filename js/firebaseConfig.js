@@ -1,11 +1,11 @@
 const firebaseConfig = {
-    apiKey: "AIzaSyCXwXbYbsdvp0-nIHjdhaC_GKWcod92yl0",
-    authDomain: "insiit-blog.firebaseapp.com",
-    projectId: "insiit-blog",
-    storageBucket: "insiit-blog.firebasestorage.app",
-    messagingSenderId: "606634005535",
-    appId: "1:606634005535:web:7d11667d2e1204f92c712a",
-    measurementId: "G-4XQBK3E421"
-  };
+  apiKey: "AIzaSyAzx_RBgcYTZL3nSW_BFcbEKd000wf3ZNo",
+  authDomain: "metis-blog.firebaseapp.com",
+  projectId: "metis-blog",
+  storageBucket: "metis-blog.firebasestorage.app",
+  messagingSenderId: "370536468058",
+  appId: "1:370536468058:web:fa20f1dea9f91318d8d263",
+  measurementId: "G-JM22MPN6WP"
+};
 
 export default firebaseConfig
