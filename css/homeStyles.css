@@ -37,3 +37,10 @@
 	color: #0056b3;
 }
 
+.no-blogs {
+	text-align: center;
+	font-size: 1.2rem;
+	color: #666;
+	margin: 2rem auto;
+	width: 100%;
+}
