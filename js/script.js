@@ -10,7 +10,7 @@ auth.languageCode = 'en'
 const provider = new GoogleAuthProvider()
 let currentUser = auth.currentUser
 const userIcon = document.querySelector('#userIcon')
-const loginButton = document.querySelector('#loginButton')
+const userDropdown = document.querySelector('#userDropdown')
 const logoutButton = document.querySelector('#logoutButton')
 
 async function signInWithGoogle() {
@@ -29,7 +29,7 @@ async function signInWithGoogle() {
 		    displayName: user.displayName,
 		    email: user.email,
 		    bio: "Hey there! I'm using IITGN blogs",
-		    imageUrl: "https://placehold.jp/150x150.png"
+		    imageUrl: user.photoURL || "https://ui-avatars.io/api/?name=" + encodeURIComponent(user.displayName || user.email) + "&background=dd7a7a&color=fff&size=150"
 	    })
 	    
 	  }).then((doc) => {
@@ -48,19 +48,47 @@ async function signInWithGoogle() {
 	     
 }
 
-
+function updateUserInterface(user) {
+	if (user) {
+		// User is signed in - show profile image and dropdown
+		const photoURL = user.photoURL
+		const displayName = user.displayName || 'User'
+		
+		if (photoURL) {
+			userIcon.innerHTML = `<img src="${photoURL}" alt="${displayName}" title="${displayName}">`
+			userIcon.classList.add('profile-image')
+		} else {
+			userIcon.innerHTML = displayName.charAt(0).toUpperCase()
+			userIcon.classList.remove('profile-image')
+		}
+		
+		// Show the dropdown
+		userDropdown.style.display = 'block'
+		
+	} else {
+		// User is signed out - show sign in button
+		userIcon.innerHTML = 'Sign In'
+		userIcon.classList.remove('profile-image')
+		userDropdown.style.display = 'none'
+	}
+}
 
 auth.onAuthStateChanged((user) => {
+	currentUser = user
+	updateUserInterface(user)
+	
+	// Remove previous event listeners to avoid duplicates
+	userIcon.removeEventListener('click', signInWithGoogle)
+	logoutButton.removeEventListener('click', signOutWithGoogle)
+	
 	if (user) {
-		userIcon.innerHTML = '<div id="logoutButton">Signout</div>'
-		userIcon.addEventListener('click', signOutWithGoogle)
+		// User is signed in - logout button in dropdown handles signout
+		logoutButton.addEventListener('click', signOutWithGoogle)
 	} else {
-		userIcon.innerHTML = '<div id="loginButton">Sign In</div>'
+		// User is signed out - clicking userIcon triggers signin
 		userIcon.addEventListener('click', signInWithGoogle)
-		currentUser = null
 	}
 })
-
 
 function signOutWithGoogle() {
 	signOut(auth)
