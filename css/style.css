@@ -7,12 +7,18 @@
 
 
 #navbar {
-	height: 1rem;
-	padding: 1rem;
+	padding: 0.5rem;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+
+	/* New additions */
+	box-shadow: 0 2px 8px rgba(128, 128, 128, 0.2); /* Soft gray shadow */
+	border-radius: 8px; /* Optional: rounded corners for style */
 }
+
+
+
 
 #loadingContainer {
 	width: 100%;

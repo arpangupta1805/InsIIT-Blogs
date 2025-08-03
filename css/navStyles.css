@@ -68,9 +68,38 @@
 
 #rightBox {
 	display: flex;
-	justify-content: space between;
+	justify-content: space-between;
+	gap: 2rem;
 }
 
+#rightBox #createBlog {
+	color: black;
+	background: rgba(128, 128, 128, 0.18);
+	border: 1px solid black;
+	border-radius: 12px;
+	padding: 0.5rem 1rem;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	text-decoration: none; /* removes underline */
+	display: inline-block; 
+}
+
+#rightBox #createBlog:hover {
+	background: rgba(0, 123, 255, 0.2);
+	color: #fff;
+}
+
+#rightBox #userStatus {
+	color: black;
+	background: rgb(221, 122, 122);
+	border: 1px solid black;
+	border-radius: 12px;
+	padding: 0.5rem 1rem;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	text-decoration: none; /* removes underline */
+	display: inline-block; 
+}
 
 @media (orientation: portrait) {
 	#searchContainer {
