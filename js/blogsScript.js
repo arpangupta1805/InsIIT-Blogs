@@ -24,7 +24,7 @@ async function getBlogs() {
   querySnapshot.forEach((doc) => {
     const docData = doc.data();
     const truncatedSubline = truncateText(docData.subline);
-    blogs.innerHTML += `<a class="blog" id="${doc.id}" href="/viewBlog?blogId=${docData.blogId}"><img class="blogImage" src="./assets/placeholderImage.jpg"><h3>${docData.title}</h3><p>${truncatedSubline}</p></a>`;
+    blogs.innerHTML += `<a class="blog" id="${doc.id}" href="viewBlog.html?blogId=${docData.blogId}"><img class="blogImage" src="./assets/placeholderImage.jpg"><h3>${docData.title}</h3><p>${truncatedSubline}</p></a>`;
   });
   hideLoadingIndicator();
   console.log("hi");
