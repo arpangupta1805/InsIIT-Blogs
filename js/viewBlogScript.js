@@ -1,6 +1,6 @@
 import app from './firebaseSetup.js'
 import { getFirestore, collection, doc, getDoc, deleteDoc, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js'
-import { getAuth } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js'
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js'
 
 const firestore = getFirestore(app)
 const auth = getAuth(app)
@@ -28,13 +28,23 @@ async function isCurrentUserAuthor() {
 }
 
 // Show/hide delete button based on user permissions
-async function updateDeleteButtonVisibility() {
-  const isAuthor = await isCurrentUserAuthor()
-  console.log('Current user is author:', isAuthor)
-  console.log('Current user email:', auth.currentUser?.email)
-  console.log('Blog author email:', currentBlogAuthorEmail)
-  deleteButton.style.display = isAuthor ? 'block' : 'none'
-  console.log('Delete button display set to:', deleteButton.style.display)
+async function updateDeleteButtonVisibility(user) {
+  if (user) {
+    console.log("User signed in on view blog page!");
+    console.log("User ID:", user.uid);
+    console.log("User Email:", user.email);
+    console.log("User Display Name:", user.displayName);
+    
+    const isAuthor = user.email === currentBlogAuthorEmail
+    console.log('Current user is author:', isAuthor)
+    console.log('Current user email:', user.email)
+    console.log('Blog author email:', currentBlogAuthorEmail)
+    deleteButton.style.display = isAuthor ? 'block' : 'none'
+    console.log('Delete button display set to:', deleteButton.style.display)
+  } else {
+    console.log("No user signed in on view blog page.")
+    deleteButton.style.display = 'none'
+  }
 }
 
 // Show delete confirmation dialog
@@ -177,7 +187,7 @@ async function init() {
   await loadBlog()
   
   // Update UI when auth state changes
-  auth.onAuthStateChanged(updateDeleteButtonVisibility)
+  onAuthStateChanged(auth, updateDeleteButtonVisibility)
 }
 
 // Start the application
