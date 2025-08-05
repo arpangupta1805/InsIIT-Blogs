@@ -31,9 +31,7 @@ class MarkdownParser {
             // Links
             { regex: /\[([^\]]+)\]\(([^)]+)\)/g, replacement: '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>' },
             
-            // Images with optional caption
-            { regex: /!\[([^\]]*)\]\(([^)]+)\)/g, replacement: '<img src="$2" alt="$1" class="blog-image">' },
-            
+
             // Blockquotes
             { regex: /^> (.*$)/gim, replacement: '<blockquote>$1</blockquote>' },
             
@@ -67,9 +65,7 @@ class MarkdownParser {
         // Handle tables
         html = this.processTables(html);
         
-        // Handle image captions
-        html = this.processImageCaptions(html);
-        
+
         return html.trim();
     }
     
@@ -142,13 +138,7 @@ class MarkdownParser {
             return tableHtml;
         });
     }
-    
-    processImageCaptions(html) {
-        // Handle image followed by italic text as caption
-        return html.replace(/<img([^>]+)>\s*<p><em>(.*?)<\/em><\/p>/g, 
-            '<figure class="blog-figure"><img$1><figcaption>$2</figcaption></figure>'
-        );
-    }
+
 }
 
 // Export for use in other files
