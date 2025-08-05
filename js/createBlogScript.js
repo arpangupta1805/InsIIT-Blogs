@@ -43,6 +43,7 @@ const blogEditor = document.getElementById('blogEditor');
 const editorTitle = document.getElementById('editorTitle');
 const publishBtn = document.getElementById('publishBlog');
 
+
 // Dialog elements
 const linkDialog = document.getElementById('linkDialog');
 
