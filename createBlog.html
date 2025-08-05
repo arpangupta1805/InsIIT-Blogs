@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/createBlogStyles.css">
 	<link rel="icon" type="image/png" href="assets/favicon.ico">
   <!-- Insert this script at the bottom of the HTML, but before you use any Firebase services -->
+  <script src="js/markdownParser.js" defer></script>
   <script src="js/firebaseSetup.js" defer type="module"></script>
   <script src="js/script.js" defer type="module"></script>
   <script src="js/createBlogScript.js" defer type="module"></script>
@@ -141,12 +142,9 @@
 				  
 				  <div class="toolbar-separator"></div>
 				  
-				  <!-- Links and Images -->
+				  <!-- Links -->
 				  <button type="button" class="toolbar-btn" data-md="link" title="Insert Link">
 					  🔗
-				  </button>
-				  <button type="button" class="toolbar-btn" data-md="image" title="Insert Image">
-					  📷
 				  </button>
 				  
 				  <div class="toolbar-separator"></div>
@@ -163,6 +161,13 @@
 				  </button>
 				  <button type="button" class="toolbar-btn" data-md="hr" title="Horizontal Rule">
 					  ―
+				  </button>
+				  
+				  <div class="toolbar-separator"></div>
+				  
+				  <!-- Preview Button -->
+				  <button type="button" id="previewBtn" class="toolbar-btn preview-btn" title="Preview Blog">
+					  👁️ Preview
 				  </button>
 			  </div>
 			  
@@ -187,28 +192,6 @@
 					  </div>
 				  </div>
 			  </div>
-			  
-			  <div id="imageDialog" class="md-dialog" style="display: none;">
-				  <div class="md-dialog-content">
-					  <h3>Insert Image</h3>
-					  <div class="form-group">
-						  <label for="imageUrl">Image URL:</label>
-						  <input type="url" id="imageUrl" placeholder="https://example.com/image.jpg">
-					  </div>
-					  <div class="form-group">
-						  <label for="imageAlt">Alt Text:</label>
-						  <input type="text" id="imageAlt" placeholder="Describe the image">
-					  </div>
-					  <div class="form-group">
-						  <label for="imageCaption">Caption (optional):</label>
-						  <input type="text" id="imageCaption" placeholder="Image caption">
-					  </div>
-					  <div class="dialog-actions">
-						  <button type="button" id="imageCancel" class="btn-cancel">Cancel</button>
-						  <button type="button" id="imageInsert" class="btn-insert">Insert</button>
-					  </div>
-				  </div>
-			  </div>
 		  </div>
 		  
 		  <div class="editor-actions">
@@ -216,8 +199,20 @@
 		  </div>
 	  </div>
 
-
-
+	  <!-- Preview Modal -->
+	  <div id="previewModal" class="preview-modal" style="display: none;">
+		  <div class="preview-modal-content">
+			  <div class="preview-header">
+				  <h2>Blog Preview</h2>
+				  <button type="button" id="closePreview" class="close-preview-btn">✕</button>
+			  </div>
+			  <div class="preview-body">
+				  <div id="previewContent" class="preview-content">
+					  <!-- Rendered markdown content will be inserted here -->
+				  </div>
+			  </div>
+		  </div>
+	  </div>
 
     <!-- Toast Notification -->
     <div id="toast" class="toast">

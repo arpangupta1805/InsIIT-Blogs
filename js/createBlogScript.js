@@ -45,7 +45,6 @@ const publishBtn = document.getElementById('publishBlog');
 
 // Dialog elements
 const linkDialog = document.getElementById('linkDialog');
-const imageDialog = document.getElementById('imageDialog');
 
 let currentSelection = { start: 0, end: 0 };
 
@@ -178,8 +177,7 @@ const markdownActions = {
     codeblock: () => insertLine('```\ncode block\n```'),
     hr: () => insertLine('---'),
     table: () => insertLine('| Header 1 | Header 2 | Header 3 |\n|----------|----------|----------|\n| Cell 1   | Cell 2   | Cell 3   |'),
-    link: () => showLinkDialog(),
-    image: () => showImageDialog()
+    link: () => showLinkDialog()
 };
 
 // Event listener for toolbar buttons
@@ -201,17 +199,8 @@ function showLinkDialog() {
     document.getElementById('linkText').focus();
 }
 
-function showImageDialog() {
-    document.getElementById('imageUrl').value = '';
-    document.getElementById('imageAlt').value = '';
-    document.getElementById('imageCaption').value = '';
-    imageDialog.style.display = 'flex';
-    document.getElementById('imageUrl').focus();
-}
-
 function hideDialogs() {
     linkDialog.style.display = 'none';
-    imageDialog.style.display = 'none';
 }
 
 // Link dialog handlers
@@ -225,23 +214,6 @@ document.getElementById('linkInsert').addEventListener('click', () => {
 
 document.getElementById('linkCancel').addEventListener('click', hideDialogs);
 
-// Image dialog handlers
-document.getElementById('imageInsert').addEventListener('click', () => {
-    const url = document.getElementById('imageUrl').value || 'https://';
-    const alt = document.getElementById('imageAlt').value || 'image';
-    const caption = document.getElementById('imageCaption').value;
-    
-    let markdown = `![${alt}](${url})`;
-    if (caption) {
-        markdown += `\n*${caption}*`;
-    }
-    
-    insertTextAtCursor(markdown);
-    hideDialogs();
-});
-
-document.getElementById('imageCancel').addEventListener('click', hideDialogs);
-
 // Close dialogs when clicking outside
 document.addEventListener('click', (e) => {
     if (e.target.classList.contains('md-dialog')) {
@@ -253,6 +225,81 @@ document.addEventListener('click', (e) => {
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         hideDialogs();
+        hidePreview();
+    }
+});
+
+// Preview functionality
+function showPreview() {
+    const markdownContent = window.markdownEditor.value.trim();
+    
+    if (!markdownContent) {
+        showToast('Please write some content to preview', 'error');
+        return;
+    }
+    
+    // Use the markdown parser that's already loaded
+    if (typeof window.MarkdownParser === 'undefined') {
+        showToast('Markdown parser not loaded. Please refresh the page.', 'error');
+        return;
+    }
+    
+    const parser = new window.MarkdownParser();
+    const htmlContent = parser.parse(markdownContent);
+    
+    // Get blog details for complete preview
+    const title = blogData.title || document.getElementById('title').value || 'Blog Title';
+    const subtitle = blogData.subtitle || document.getElementById('subtitle').value || 'Blog Subtitle';
+    const author = blogData.authorName || document.getElementById('authorName').value || 'Author';
+    const publishDate = blogData.publishDate || document.getElementById('publishDate').value || new Date().toISOString().split('T')[0];
+    const category = blogData.category || document.getElementById('category').value || 'Uncategorized';
+    
+    // Format the date
+    const formattedDate = new Date(publishDate).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    
+    // Create the complete preview HTML
+    const previewHTML = `
+        <div class="blog-header">
+            <h1>${title}</h1>
+            <h2 class="blog-subtitle">${subtitle}</h2>
+            <div class="blog-meta">
+                <span class="author">By ${author}</span> • 
+                <span class="date">${formattedDate}</span> • 
+                <span class="category">${category}</span>
+            </div>
+        </div>
+        <div class="blog-content">
+            ${htmlContent}
+        </div>
+    `;
+    
+    // Display the preview
+    document.getElementById('previewContent').innerHTML = previewHTML;
+    document.getElementById('previewModal').style.display = 'flex';
+    
+    // Prevent body scrolling
+    document.body.style.overflow = 'hidden';
+}
+
+function hidePreview() {
+    document.getElementById('previewModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// Preview button event listener
+document.getElementById('previewBtn').addEventListener('click', showPreview);
+
+// Close preview button event listener
+document.getElementById('closePreview').addEventListener('click', hidePreview);
+
+// Close preview when clicking outside modal content
+document.getElementById('previewModal').addEventListener('click', (e) => {
+    if (e.target.id === 'previewModal') {
+        hidePreview();
     }
 });
 
