@@ -46,6 +46,7 @@ const publishBtn = document.getElementById('publishBlog');
 // Dialog elements
 const linkDialog = document.getElementById('linkDialog');
 
+
 let currentSelection = { start: 0, end: 0 };
 
 // Auto-populate user data when page loads
@@ -177,7 +178,9 @@ const markdownActions = {
     codeblock: () => insertLine('```\ncode block\n```'),
     hr: () => insertLine('---'),
     table: () => insertLine('| Header 1 | Header 2 | Header 3 |\n|----------|----------|----------|\n| Cell 1   | Cell 2   | Cell 3   |'),
+
     link: () => showLinkDialog()
+
 };
 
 // Event listener for toolbar buttons
@@ -199,8 +202,10 @@ function showLinkDialog() {
     document.getElementById('linkText').focus();
 }
 
+
 function hideDialogs() {
     linkDialog.style.display = 'none';
+
 }
 
 // Link dialog handlers
@@ -214,6 +219,7 @@ document.getElementById('linkInsert').addEventListener('click', () => {
 
 document.getElementById('linkCancel').addEventListener('click', hideDialogs);
 
+
 // Close dialogs when clicking outside
 document.addEventListener('click', (e) => {
     if (e.target.classList.contains('md-dialog')) {
@@ -225,6 +231,7 @@ document.addEventListener('click', (e) => {
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         hideDialogs();
+
         hidePreview();
     }
 });
@@ -300,6 +307,7 @@ document.getElementById('closePreview').addEventListener('click', hidePreview);
 document.getElementById('previewModal').addEventListener('click', (e) => {
     if (e.target.id === 'previewModal') {
         hidePreview();
+
     }
 });
 

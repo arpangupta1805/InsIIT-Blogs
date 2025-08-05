@@ -31,6 +31,7 @@ class MarkdownParser {
             // Links
             { regex: /\[([^\]]+)\]\(([^)]+)\)/g, replacement: '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>' },
             
+
             // Blockquotes
             { regex: /^> (.*$)/gim, replacement: '<blockquote>$1</blockquote>' },
             
@@ -64,6 +65,7 @@ class MarkdownParser {
         // Handle tables
         html = this.processTables(html);
         
+
         return html.trim();
     }
     
@@ -136,6 +138,7 @@ class MarkdownParser {
             return tableHtml;
         });
     }
+
 }
 
 // Export for use in other files
