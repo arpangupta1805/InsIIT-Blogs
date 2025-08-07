@@ -1,10 +1,10 @@
 const firebaseConfig = {
-  apiKey: "AIzaSyBfN9Pl1lW-KZ_oGEDo02lvMTN10c7mpkI",
-  authDomain: "insiit-blog-8e7c5.firebaseapp.com",
-  projectId: "insiit-blog-8e7c5",
-  storageBucket: "insiit-blog-8e7c5.firebasestorage.app",
-  messagingSenderId: "369640346977",
-  appId: "1:369640346977:web:7946eb2cbfc75b510be120"
-};
+        apiKey: "AIzaSyBJmSPPpF5Wr2K77rVHEVnB-WDlOdYp25A",
+        authDomain: "insiit-blogs.firebaseapp.com",
+        projectId: "insiit-blogs",
+        storageBucket: "insiit-blogs.firebasestorage.app",
+        messagingSenderId: "125224944479",
+        appId: "1:125224944479:web:f3be4413220cdda129acea"
+}
 
 export default firebaseConfig
