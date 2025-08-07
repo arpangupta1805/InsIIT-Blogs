@@ -253,7 +253,7 @@
 	padding: 2rem;
 	box-shadow: 0 2px 16px var(--navbar-shadow, rgba(58, 58, 58, 0.2));
 	/* Soft gray shadow */
-	background-color: var(--search-bg, #ffffff);
+	background-color: var(--bg-secondary, #ffffff);
 }
 
 #footer-content {
@@ -276,6 +276,22 @@
 
 #contributors {
 	flex:1;
+}
+
+#contributors a{
+	color: var(--text-primary);
+	text-decoration: none;
+}
+
+#contributors a:hover{
+	color: var(--text-secondary);
+	text-decoration: none;
+}
+
+#metis {
+	text-align: center;
+	font-weight: bold;
+	padding-bottom: 1rem;
 }
 
 @media (orientation: portrait) {
@@ -334,5 +350,9 @@
 	.logout-btn {
 		padding: 0.6rem 0.8rem;
 		font-size: 0.85rem;
+	}
+
+	#footer-content {
+		padding-bottom: 4rem;
 	}
 }
