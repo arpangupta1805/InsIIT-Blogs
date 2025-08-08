@@ -781,3 +781,53 @@
         gap: 0.3rem;
     }
 }
+
+.club-options {
+	display: inline-flex;
+	flex-direction: column;
+	gap: 12px;
+	margin-top: 6px;
+}
+
+.club-option {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 16px;
+	font-weight: 500;
+	line-height: 1;
+	position: relative;
+	cursor: pointer;
+}
+
+.club-option input[type="radio"] {
+	width: 16px;
+	height: 16px;
+	margin: 0;
+	cursor: pointer;
+}
+
+.club-option input[type="radio"]:focus {
+	outline: none;
+	box-shadow: none;
+}
+
+input[type="radio"] {
+	accent-color: #000;
+}
+
+@media (prefers-color-scheme: dark) {
+	body {
+		background-color: #121212;
+		color: #fff;
+	}
+
+	.club-option {
+		color: #fff;
+	}
+
+	input[type="radio"] {
+		accent-color: #fff;
+	}
+}
+
