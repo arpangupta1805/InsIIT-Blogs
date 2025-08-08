@@ -30,7 +30,8 @@ let blogData = {
     username: '',
     publishDate: '',
     category: '',
-    body: ''
+    body: '',
+    club: ''
 };
 
 // DOM Elements
@@ -396,6 +397,7 @@ function saveDetailsData() {
     blogData.username = form.username.value;
     blogData.publishDate = form.publishDate.value;
     blogData.category = form.category.value;
+    blogData.club=form.querySelector('input[name="club"]:checked').value;
 }
 
 function showDetailsStep() {
@@ -450,6 +452,7 @@ publishBtn.addEventListener('click', async () => {
             username: blogData.username,
             publishDate: blogData.publishDate,
             category: blogData.category,
+            club: blogData.club,
             authorEmail: auth.currentUser.email,
             createdAt: new Date().toISOString(),
             status: 'published',
@@ -463,6 +466,7 @@ publishBtn.addEventListener('click', async () => {
             username: blogData.username,
             publishDate: blogData.publishDate,
             category: blogData.category,
+            club: blogData.club,
             authorEmail: auth.currentUser.email,
             blogId: docRef.id,
             createdAt: new Date().toISOString(),
