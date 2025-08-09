@@ -1,4 +1,4 @@
-import { getFirestore, collection, addDoc } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js'
+import { getFirestore, collection, addDoc, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js'
 import auth from './script.js'
 import app from './firebaseSetup.js'
 
@@ -29,7 +29,6 @@ let blogData = {
     authorName: '',
     username: '',
     publishDate: '',
-    category: '',
     body: '',
     club: ''
 };
@@ -261,7 +260,6 @@ function showPreview() {
     const subtitle = blogData.subtitle || document.getElementById('subtitle').value || 'Blog Subtitle';
     const author = blogData.authorName || document.getElementById('authorName').value || 'Author';
     const publishDate = blogData.publishDate || document.getElementById('publishDate').value || new Date().toISOString().split('T')[0];
-    const category = blogData.category || document.getElementById('category').value || 'Uncategorized';
     
     // Format the date
     const formattedDate = new Date(publishDate).toLocaleDateString('en-US', {
@@ -278,7 +276,6 @@ function showPreview() {
             <div class="blog-meta">
                 <span class="author">By ${author}</span> • 
                 <span class="date">${formattedDate}</span> • 
-                <span class="category">${category}</span>
             </div>
         </div>
         <div class="blog-content">
@@ -313,13 +310,32 @@ document.getElementById('previewModal').addEventListener('click', (e) => {
     }
 });
 
-function populateUserData() {
+async function populateUserData() {
     const authorNameInput = document.getElementById('authorName');
     const usernameInput = document.getElementById('username');
     
     if (auth.currentUser) {
-        authorNameInput.value = auth.currentUser.displayName || 'Anonymous User';
-        usernameInput.value = auth.currentUser.email?.split('@')[0] || 'anonymous';
+        try {
+            // Try to get current user data from authors collection
+            const authorsRef = collection(firestore, 'authors');
+            const q = query(authorsRef, where('email', '==', auth.currentUser.email));
+            const querySnapshot = await getDocs(q);
+            
+            if (!querySnapshot.empty) {
+                const userData = querySnapshot.docs[0].data();
+                authorNameInput.value = userData.displayName || auth.currentUser.displayName || 'Anonymous User';
+                usernameInput.value = userData.username || auth.currentUser.email?.split('@')[0] || 'anonymous';
+            } else {
+                // Fallback to auth data if not found in authors collection
+                authorNameInput.value = auth.currentUser.displayName || 'Anonymous User';
+                usernameInput.value = auth.currentUser.email?.split('@')[0] || 'anonymous';
+            }
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+            // Fallback to auth data on error
+            authorNameInput.value = auth.currentUser.displayName || 'Anonymous User';
+            usernameInput.value = auth.currentUser.email?.split('@')[0] || 'anonymous';
+        }
     }
 }
 
@@ -357,7 +373,6 @@ function validateDetailsForm() {
     const title = form.title.value.trim();
     const subtitle = form.subtitle.value.trim();
     const publishDate = form.publishDate.value;
-    const category = form.category.value;
     const selectedClub = form.querySelector('input[name="club"]:checked');
 
     if (!title) {
@@ -375,10 +390,6 @@ function validateDetailsForm() {
         return false;
     }
 
-    if (!category) {
-        showToast('Please select a category', 'error');
-        return false;
-    }
 
     if (!selectedClub) {
         showToast('Please select a club', 'error');
@@ -396,7 +407,6 @@ function saveDetailsData() {
     blogData.authorName = form.authorName.value;
     blogData.username = form.username.value;
     blogData.publishDate = form.publishDate.value;
-    blogData.category = form.category.value;
     blogData.club=form.querySelector('input[name="club"]:checked').value;
 }
 
@@ -451,7 +461,6 @@ publishBtn.addEventListener('click', async () => {
             author: blogData.authorName,
             username: blogData.username,
             publishDate: blogData.publishDate,
-            category: blogData.category,
             club: blogData.club,
             authorEmail: auth.currentUser.email,
             createdAt: new Date().toISOString(),
@@ -465,7 +474,6 @@ publishBtn.addEventListener('click', async () => {
             author: blogData.authorName,
             username: blogData.username,
             publishDate: blogData.publishDate,
-            category: blogData.category,
             club: blogData.club,
             authorEmail: auth.currentUser.email,
             blogId: docRef.id,
