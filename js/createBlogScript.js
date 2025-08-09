@@ -29,7 +29,6 @@ let blogData = {
     authorName: '',
     username: '',
     publishDate: '',
-    category: '',
     body: '',
     club: ''
 };
@@ -261,7 +260,6 @@ function showPreview() {
     const subtitle = blogData.subtitle || document.getElementById('subtitle').value || 'Blog Subtitle';
     const author = blogData.authorName || document.getElementById('authorName').value || 'Author';
     const publishDate = blogData.publishDate || document.getElementById('publishDate').value || new Date().toISOString().split('T')[0];
-    const category = blogData.category || document.getElementById('category').value || 'Uncategorized';
     
     // Format the date
     const formattedDate = new Date(publishDate).toLocaleDateString('en-US', {
@@ -278,7 +276,6 @@ function showPreview() {
             <div class="blog-meta">
                 <span class="author">By ${author}</span> • 
                 <span class="date">${formattedDate}</span> • 
-                <span class="category">${category}</span>
             </div>
         </div>
         <div class="blog-content">
@@ -357,7 +354,6 @@ function validateDetailsForm() {
     const title = form.title.value.trim();
     const subtitle = form.subtitle.value.trim();
     const publishDate = form.publishDate.value;
-    const category = form.category.value;
     const selectedClub = form.querySelector('input[name="club"]:checked');
 
     if (!title) {
@@ -375,10 +371,6 @@ function validateDetailsForm() {
         return false;
     }
 
-    if (!category) {
-        showToast('Please select a category', 'error');
-        return false;
-    }
 
     if (!selectedClub) {
         showToast('Please select a club', 'error');
@@ -396,7 +388,6 @@ function saveDetailsData() {
     blogData.authorName = form.authorName.value;
     blogData.username = form.username.value;
     blogData.publishDate = form.publishDate.value;
-    blogData.category = form.category.value;
     blogData.club=form.querySelector('input[name="club"]:checked').value;
 }
 
@@ -451,7 +442,6 @@ publishBtn.addEventListener('click', async () => {
             author: blogData.authorName,
             username: blogData.username,
             publishDate: blogData.publishDate,
-            category: blogData.category,
             club: blogData.club,
             authorEmail: auth.currentUser.email,
             createdAt: new Date().toISOString(),
@@ -465,7 +455,6 @@ publishBtn.addEventListener('click', async () => {
             author: blogData.authorName,
             username: blogData.username,
             publishDate: blogData.publishDate,
-            category: blogData.category,
             club: blogData.club,
             authorEmail: auth.currentUser.email,
             blogId: docRef.id,
