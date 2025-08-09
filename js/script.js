@@ -15,8 +15,7 @@ const userDropdown = document.querySelector('#userDropdown')
 const logoutButton = document.querySelector('#logoutButton')
 const viewProfileButton = document.querySelector('#viewProfileButton')
 
-// Profile page variables
-let userDocId = null
+
 
 
 async function signInWithGoogle() {
@@ -34,6 +33,7 @@ async function signInWithGoogle() {
 	    return addDoc(collection(firestore, "authors"), {
 		    displayName: user.displayName,
 		    email: user.email,
+		    username: generateUsernameFromEmail(user.email),
 		    bio: "Hey there! I'm using IITGN blogs",
 		    imageUrl: user.photoURL || "https://ui-avatars.io/api/?name=" + encodeURIComponent(user.displayName || user.email) + "&background=dd7a7a&color=fff&size=150"
 	    })
@@ -114,10 +114,10 @@ auth.onAuthStateChanged((user) => {
 			viewProfileButton.addEventListener('click', goToProfile);
 		}
 
-		// Load profile data if on profile page
-		if (window.location.pathname.includes('profile.html')) {
-			loadUserProfile();
-		}
+		// Load profile data if on profile page - handled by profileScript.js
+		// if (window.location.pathname.includes('profile.html')) {
+		//     Profile functionality moved to profileScript.js
+		// }
 
 	} else {
 		// User is signed out.
@@ -151,302 +151,23 @@ function goToProfile() {
 	window.location.href = 'profile.html'
 }
 
-// Load user's blogs for profile page
-async function loadUserBlogs() {
-	try {
-		if (!currentUser || !currentUser.email) {
-			console.log("No user found for loading blogs");
-			return;
-		}
+// Load user's blogs for profile page - moved to profileScript.js
 
-		console.log("Loading blogs for user:", currentUser.email);
-		
-		const userBlogsContainer = document.getElementById('userBlogs');
-		const blogCountElement = document.getElementById('blogCount');
-		
-		if (!userBlogsContainer || !blogCountElement) {
-			console.log("Blog container elements not found on this page");
-			return;
-		}
 
-		// Show loading state
-		userBlogsContainer.innerHTML = `
-			<div class="loading-blogs">
-				<img src="assets/loadingImage.gif" alt="Loading...">
-				<p>Loading your blogs...</p>
-			</div>
-		`;
 
-		// Query user's blogs from blogsRef collection
-		const blogsRef = collection(db, 'blogsRef');
-		const q = query(blogsRef, where('authorEmail', '==', currentUser.email));
-		const querySnapshot = await getDocs(q);
-		
-		console.log(`Found ${querySnapshot.size} blogs for user`);
 
-		// Update blog count
-		const blogCount = querySnapshot.size;
-		blogCountElement.textContent = `${blogCount} blog${blogCount !== 1 ? 's' : ''}`;
 
-		if (querySnapshot.empty) {
-			// No blogs found
-			userBlogsContainer.innerHTML = `
-				<div class="no-blogs-message">
-					<h3>No blogs yet</h3>
-					<p>You haven't created any blogs yet. Start sharing your thoughts with the world!</p>
-					<a href="createBlog.html" class="create-first-blog-btn">Create Your First Blog</a>
-				</div>
-			`;
-		} else {
-			// Display blogs in grid
-			let blogsHTML = '<div class="blogs-grid">';
-			
-			querySnapshot.forEach((doc) => {
-				const blogData = doc.data();
-				const blogDate = blogData.createdAt ? new Date(blogData.createdAt).toLocaleDateString('en-US', {
-					year: 'numeric',
-					month: 'short',
-					day: 'numeric'
-				}) : 'Unknown date';
+// Profile editing functionality moved to profileScript.js
 
-				blogsHTML += `
-					<div class="user-blog-card" onclick="window.open('viewBlog.html?blogId=${blogData.blogId}', '_blank')">
-						<div class="blog-card-header">
-							<h3 class="blog-card-title">${blogData.title || 'Untitled'}</h3>
-							<p class="blog-card-date">${blogDate}</p>
-						</div>
-						<p class="blog-card-subline">${blogData.subline || 'No description available'}</p>
-						<div class="blog-card-footer">
-							<span class="blog-card-stats">Published</span>
-							<div class="blog-card-actions">
-								<a href="viewBlog.html?blogId=${blogData.blogId}" class="view-blog-btn" onclick="event.stopPropagation()">View Blog</a>
-							</div>
-						</div>
-					</div>
-				`;
-			});
-			
-			blogsHTML += '</div>';
-			userBlogsContainer.innerHTML = blogsHTML;
-		}
+// Save field functionality moved to profileScript.js
 
-	} catch (error) {
-		console.error('Error loading user blogs:', error);
-		const userBlogsContainer = document.getElementById('userBlogs');
-		if (userBlogsContainer) {
-			userBlogsContainer.innerHTML = `
-				<div class="no-blogs-message">
-					<h3>Error loading blogs</h3>
-					<p>There was an error loading your blogs. Please refresh the page and try again.</p>
-				</div>
-			`;
-		}
-	}
-}
+// Cancel edit functionality moved to profileScript.js
 
-// Profile page functionality
-async function loadUserProfile() {
-	try {
-		console.log("Starting to load user profile...");
-		showLoading(true);
-		
-		// Find user document in authors collection
-		const authorsRef = collection(db, 'authors');
-		const q = query(authorsRef, where('email', '==', currentUser.email));
-		console.log("Querying for user with email:", currentUser.email);
-		
-		const querySnapshot = await getDocs(q);
-		console.log("Query completed. Found documents:", querySnapshot.size);
-		
-		// Get DOM elements
-		const profileImage = document.getElementById('profileImage');
-		const displayNameInput = document.getElementById('displayName');
-		const usernameInput = document.getElementById('username');
-		const emailInput = document.getElementById('email');
-		const bioInput = document.getElementById('bio');
-		
-		console.log("Profile DOM elements check:");
-		console.log("- profileImage:", profileImage ? "Found" : "NOT FOUND");
-		console.log("- displayNameInput:", displayNameInput ? "Found" : "NOT FOUND");
-		console.log("- usernameInput:", usernameInput ? "Found" : "NOT FOUND");
-		console.log("- emailInput:", emailInput ? "Found" : "NOT FOUND");
-		console.log("- bioInput:", bioInput ? "Found" : "NOT FOUND");
-		
-		if (!querySnapshot.empty) {
-			const userDoc = querySnapshot.docs[0];
-			userDocId = userDoc.id;
-			const userData = userDoc.data();
-			console.log("User data found:", userData);
-			
-			// Populate form fields
-			if (profileImage) profileImage.src = userData.imageUrl || currentUser.photoURL || 'assets/placeholderImage.jpg';
-			if (displayNameInput) displayNameInput.value = userData.displayName || currentUser.displayName || '';
-			if (usernameInput) usernameInput.value = userData.username || currentUser.email;
-			if (emailInput) emailInput.value = currentUser.email;
-			if (bioInput) bioInput.value = userData.bio || '';
-			
-			console.log("Form fields populated:");
-			console.log("- Profile image src:", profileImage ? profileImage.src : "Element not found");
-			console.log("- Display name:", displayNameInput ? displayNameInput.value : "Element not found");
-			console.log("- Username:", usernameInput ? usernameInput.value : "Element not found");
-			console.log("- Email:", emailInput ? emailInput.value : "Element not found");
-			console.log("- Bio:", bioInput ? bioInput.value : "Element not found");
-			
-			console.log("Profile loaded successfully!");
-		} else {
-			console.log('User document not found in authors collection');
-			console.log('Setting default values...');
-			
-			// If user document doesn't exist, populate with default values
-			if (profileImage) profileImage.src = currentUser.photoURL || 'assets/placeholderImage.jpg';
-			if (displayNameInput) displayNameInput.value = currentUser.displayName || '';
-			if (usernameInput) usernameInput.value = currentUser.email;
-			if (emailInput) emailInput.value = currentUser.email;
-			if (bioInput) bioInput.value = "Hey there! I'm using IITGN blogs";
-			
-			console.log("Default values set for new user");
-		}
-		
-		// Setup profile page event listeners
-		setupProfileEventListeners();
-		
-		// Load user's blogs
-		loadUserBlogs();
-		
-	} catch (error) {
-		console.error('Error loading user profile:', error);
-		showNotification('Error loading profile data', 'error');
-	} finally {
-		showLoading(false);
-		console.log("Loading completed, hiding loading overlay");
-	}
-}
+// Username generation moved to profileScript.js
 
-function setupProfileEventListeners() {
-	const saveAllBtn = document.getElementById('saveAllBtn');
+// Utility functions moved to profileScript.js
 
-	// Save all changes at once
-	if (saveAllBtn) {
-		saveAllBtn.addEventListener('click', async () => {
-			try {
-				console.log("Save All button clicked!");
-				showLoading(true);
-				
-				const bioInput = document.getElementById('bio');
-				
-				const updateData = {
-					bio: bioInput ? bioInput.value : '',
-					email: currentUser.email
-				};
-				
-				console.log("Update data:", updateData);
-				console.log("User doc ID:", userDocId);
-				
-				if (userDocId) {
-					// Update existing document
-					console.log("Updating existing user document...");
-					await updateDoc(doc(db, 'authors', userDocId), updateData);
-				} else {
-					// Create new document - include current user's displayName, username, and imageUrl from auth
-					console.log("Creating new user document...");
-					const displayNameInput = document.getElementById('displayName');
-					const usernameInput = document.getElementById('username');
-					const profileImage = document.getElementById('profileImage');
-					
-					const newUserData = {
-						...updateData,
-						displayName: displayNameInput ? displayNameInput.value : '',
-						username: usernameInput ? usernameInput.value : '',
-						imageUrl: profileImage ? profileImage.src : ''
-					};
-					
-					const docRef = await addDoc(collection(db, 'authors'), newUserData);
-					userDocId = docRef.id;
-					console.log("New document created with ID:", userDocId);
-				}
-				
-				// No need to update Firebase Auth profile since no changes are allowed
-				console.log("Profile save completed - only bio updated!");
-				
-				showNotification('Profile updated successfully!', 'success');
-				
-				console.log("Profile save completed successfully!");
-				
-			} catch (error) {
-				console.error('Error updating profile:', error);
-				showNotification('Error updating profile: ' + error.message, 'error');
-			} finally {
-				showLoading(false);
-			}
-		});
-		console.log("Save All button event listener attached successfully!");
-	} else {
-		console.log("Save All button not found!");
-	}
-}
-
-// Utility functions
-function showLoading(show) {
-	const loadingOverlay = document.getElementById('loadingOverlay');
-	console.log("showLoading called with:", show);
-	if (loadingOverlay) {
-		loadingOverlay.style.display = show ? 'flex' : 'none';
-		console.log("Loading overlay display set to:", loadingOverlay.style.display);
-	} else {
-		console.log("Loading overlay element not found!");
-	}
-}
-
-function showNotification(message, type = 'info') {
-	// Create notification element
-	const notification = document.createElement('div');
-	notification.className = `notification ${type}`;
-	notification.textContent = message;
-	
-	// Add styles
-	notification.style.cssText = `
-		position: fixed;
-		top: 20px;
-		right: 20px;
-		padding: 1rem 1.5rem;
-		border-radius: 8px;
-		color: white;
-		font-weight: 600;
-		z-index: 10000;
-		opacity: 0;
-		transform: translateX(100%);
-		transition: all 0.3s ease;
-	`;
-	
-	// Set background color based on type
-	switch (type) {
-		case 'success':
-			notification.style.background = '#28a745';
-			break;
-		case 'error':
-			notification.style.background = '#dc3545';
-			break;
-		default:
-			notification.style.background = '#007bff';
-	}
-	
-	document.body.appendChild(notification);
-	
-	// Animate in
-	setTimeout(() => {
-		notification.style.opacity = '1';
-		notification.style.transform = 'translateX(0)';
-	}, 100);
-	
-	// Remove after 3 seconds
-	setTimeout(() => {
-		notification.style.opacity = '0';
-		notification.style.transform = 'translateX(100%)';
-		setTimeout(() => {
-			document.body.removeChild(notification);
-		}, 300);
-	}, 3000);
-}
+// showNotification function moved to profileScript.js
 
 
 

@@ -12,6 +12,7 @@
     <link rel="icon" type="image/png" href="assets/favicon.ico">
     <script src="js/firebaseSetup.js" defer type="module"></script>
     <script src="js/script.js" defer type="module"></script>
+    <script src="js/profileScript.js" defer type="module"></script>
     <script src="js/darkMode.js" defer></script>
 </head>
 <body>
@@ -54,14 +55,28 @@
                 <div class="profile-form">
                     <div class="form-group">
                         <label for="displayName">Full Name</label>
-                        <input type="text" id="displayName" class="form-input" placeholder="Enter your full name" readonly>
-                        <small class="field-note">Full name cannot be changed</small>
+                        <div class="input-with-buttons">
+                            <input type="text" id="displayName" class="form-input editable-field" placeholder="Enter your full name" readonly>
+                            <div class="field-buttons">
+                                <button type="button" class="edit-btn" data-field="displayName">Edit</button>
+                                <button type="button" class="save-btn" data-field="displayName" style="display: none;">Save</button>
+                                <button type="button" class="cancel-btn" data-field="displayName" style="display: none;">Cancel</button>
+                            </div>
+                        </div>
+                        <small class="field-note">Click edit to change your full name</small>
                     </div>
 
                     <div class="form-group">
                         <label for="username">Username</label>
-                        <input type="text" id="username" class="form-input" placeholder="Username (defaults to email)" readonly>
-                        <small class="field-note">Username cannot be changed</small>
+                        <div class="input-with-buttons">
+                            <input type="text" id="username" class="form-input editable-field" placeholder="Username (defaults to email)" readonly>
+                            <div class="field-buttons">
+                                <button type="button" class="edit-btn" data-field="username">Edit</button>
+                                <button type="button" class="save-btn" data-field="username" style="display: none;">Save</button>
+                                <button type="button" class="cancel-btn" data-field="username" style="display: none;">Cancel</button>
+                            </div>
+                        </div>
+                        <small class="field-note">Click edit to change your username</small>
                     </div>
 
                     <div class="form-group">
