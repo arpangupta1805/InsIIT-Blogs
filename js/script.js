@@ -13,13 +13,13 @@ const userDropdown = document.querySelector('#userDropdown')
 const logoutButton = document.querySelector('#logoutButton')
 const viewProfileButton = document.querySelector('#viewProfileButton')
 
+
 // Helper function to generate username from email
 function generateUsernameFromEmail(email) {
 	if (!email) return '';
 	// Extract the part before @ and remove dots and special characters
 	return email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 }
-
 async function signInWithGoogle() {
 	signInWithPopup(auth, provider)
 	  .then((result) => {
@@ -108,7 +108,7 @@ auth.onAuthStateChanged((user) => {
 			viewProfileButton.addEventListener('click', goToProfile);
 		}
 
-		// Profile functionality is handled by profileScript.js
+
 
 	} else {
 		// User is signed out.

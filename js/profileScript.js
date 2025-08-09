@@ -225,12 +225,14 @@ async function saveField(fieldName) {
 		if (userDocId) {
 			// Update existing document
 			await updateDoc(doc(db, 'authors', userDocId), updateData);
+
 			
 			// If displayName was updated, sync it across all blogs
 			if (fieldName === 'displayName') {
 				console.log("Syncing displayName across all blogs...");
 				await syncDisplayNameInBlogs(currentUser.email, newValue);
 			}
+
 		} else {
 			// Create new document if it doesn't exist
 			const displayNameInput = document.getElementById('displayName');
@@ -457,10 +459,12 @@ function showNotification(message, type = 'info') {
 		case 'error':
 			notification.style.background = '#dc3545';
 			break;
+
 		case 'warning':
 			notification.style.background = '#ffc107';
 			notification.style.color = '#212529';
 			break;
+
 		default:
 			notification.style.background = '#007bff';
 	}
@@ -482,6 +486,7 @@ function showNotification(message, type = 'info') {
 		}, 300);
 	}, 3000);
 }
+
 
 // Author profile page functionality
 async function loadAuthorProfile() {
@@ -692,6 +697,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 		});
 	}
+
 	// Check if we're on the author page
 	else if (window.location.pathname.includes('author.html')) {
 		// Load author profile directly (doesn't require authentication)
@@ -701,3 +707,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Export functions that might be needed by other scripts
 export { loadUserProfile, loadUserBlogs, loadAuthorProfile, loadAuthorBlogs, showLoading, showNotification };
+
