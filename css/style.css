@@ -262,7 +262,7 @@
 	flex-wrap: wrap;
 	justify-content: left;
 	gap: 4rem;
-	padding-bottom: 1rem;
+	padding-bottom: 2rem;
 	text-align: justify;
 }
 
@@ -354,5 +354,6 @@
 
 	#footer-content {
 		padding-bottom: 4rem;
+		flex-direction: column;
 	}
 }
