@@ -30,7 +30,8 @@ let blogData = {
     username: '',
     publishDate: '',
     category: '',
-    body: ''
+    body: '',
+    club: ''
 };
 
 // DOM Elements
@@ -324,6 +325,22 @@ function populateUserData() {
 
 // Step navigation
 nextToBodyBtn.addEventListener('click', () => {
+    const clubRadios = document.getElementsByName('club');
+    let selectedClub = null;
+
+    for (const radio of clubRadios) {
+        if (radio.checked) {
+            selectedClub = radio.value;
+            break;
+        }
+    }
+
+    if (!selectedClub) {
+        alert("Please select a club before continuing.");
+    } else {
+        console.log("Selected club:", selectedClub);
+    }
+
     if (validateDetailsForm()) {
         saveDetailsData();
         showBodyStep();
@@ -334,35 +351,43 @@ backToDetailsBtn.addEventListener('click', () => {
     showDetailsStep();
 });
 
+
 function validateDetailsForm() {
     const form = blogDetailsForm;
     const title = form.title.value.trim();
     const subtitle = form.subtitle.value.trim();
     const publishDate = form.publishDate.value;
     const category = form.category.value;
-    
+    const selectedClub = form.querySelector('input[name="club"]:checked');
+
     if (!title) {
         showToast('Please enter a blog title', 'error');
         return false;
     }
-    
+
     if (!subtitle) {
         showToast('Please enter a blog subtitle', 'error');
         return false;
     }
-    
+
     if (!publishDate) {
         showToast('Please select a publish date', 'error');
         return false;
     }
-    
+
     if (!category) {
         showToast('Please select a category', 'error');
         return false;
     }
-    
+
+    if (!selectedClub) {
+        showToast('Please select a club', 'error');
+        return false;
+    }
+
     return true;
 }
+
 
 function saveDetailsData() {
     const form = blogDetailsForm;
@@ -372,6 +397,7 @@ function saveDetailsData() {
     blogData.username = form.username.value;
     blogData.publishDate = form.publishDate.value;
     blogData.category = form.category.value;
+    blogData.club=form.querySelector('input[name="club"]:checked').value;
 }
 
 function showDetailsStep() {
@@ -426,6 +452,7 @@ publishBtn.addEventListener('click', async () => {
             username: blogData.username,
             publishDate: blogData.publishDate,
             category: blogData.category,
+            club: blogData.club,
             authorEmail: auth.currentUser.email,
             createdAt: new Date().toISOString(),
             status: 'published',
@@ -439,6 +466,7 @@ publishBtn.addEventListener('click', async () => {
             username: blogData.username,
             publishDate: blogData.publishDate,
             category: blogData.category,
+            club: blogData.club,
             authorEmail: auth.currentUser.email,
             blogId: docRef.id,
             createdAt: new Date().toISOString(),
