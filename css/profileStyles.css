@@ -99,6 +99,66 @@
     margin-bottom: 1.5rem;
 }
 
+.input-with-buttons {
+    display: flex;
+    align-items: stretch;
+    gap: 0.5rem;
+}
+
+.input-with-buttons .form-input {
+    flex: 1;
+    width: auto; /* Override the 100% width for flex items */
+}
+
+.field-buttons {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+}
+
+.field-buttons button {
+    padding: 0.5rem 0.75rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.edit-btn {
+    background: #007bff;
+    color: white;
+}
+
+.edit-btn:hover {
+    background: #0056b3;
+}
+
+.save-btn {
+    background: #28a745;
+    color: white;
+}
+
+.save-btn:hover {
+    background: #1e7e34;
+}
+
+.cancel-btn {
+    background: #6c757d;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background: #545b62;
+}
+
+.field-buttons button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 .form-group label {
     display: block;
     margin-bottom: 0.5rem;
@@ -133,48 +193,6 @@
 .form-input.editing {
     border-color: #28a745;
     background-color: white;
-}
-
-.edit-actions {
-    margin-top: 0.5rem;
-    display: flex;
-    gap: 0.5rem;
-}
-
-.edit-btn, .save-btn, .cancel-btn {
-    padding: 0.4rem 0.8rem;
-    border: none;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.edit-btn {
-    background: #007bff;
-    color: white;
-}
-
-.edit-btn:hover {
-    background: #0056b3;
-}
-
-.save-btn {
-    background: #28a745;
-    color: white;
-}
-
-.save-btn:hover {
-    background: #1e7e34;
-}
-
-.cancel-btn {
-    background: #6c757d;
-    color: white;
-}
-
-.cancel-btn:hover {
-    background: #545b62;
 }
 
 .field-note {
@@ -535,5 +553,21 @@
         flex-direction: column;
         gap: 0.5rem;
         align-items: flex-start;
+    }
+    
+    /* Mobile responsiveness for editable fields */
+    .input-with-buttons {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: stretch;
+    }
+    
+    .field-buttons {
+        justify-content: flex-start;
+    }
+    
+    .field-buttons button {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
     }
 }

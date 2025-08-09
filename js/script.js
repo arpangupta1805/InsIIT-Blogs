@@ -34,6 +34,7 @@ async function signInWithGoogle() {
 	    return addDoc(collection(firestore, "authors"), {
 		    displayName: user.displayName,
 		    email: user.email,
+		    username: generateUsernameFromEmail(user.email),
 		    bio: "Hey there! I'm using IITGN blogs",
 		    imageUrl: user.photoURL || "https://ui-avatars.io/api/?name=" + encodeURIComponent(user.displayName || user.email) + "&background=dd7a7a&color=fff&size=150"
 	    })
@@ -281,7 +282,11 @@ async function loadUserProfile() {
 			// Populate form fields
 			if (profileImage) profileImage.src = userData.imageUrl || currentUser.photoURL || 'assets/placeholderImage.jpg';
 			if (displayNameInput) displayNameInput.value = userData.displayName || currentUser.displayName || '';
-			if (usernameInput) usernameInput.value = userData.username || currentUser.email;
+			if (usernameInput) {
+				// Use stored username, or generate one from email if not available
+				const username = userData.username || generateUsernameFromEmail(currentUser.email);
+				usernameInput.value = username;
+			}
 			if (emailInput) emailInput.value = currentUser.email;
 			if (bioInput) bioInput.value = userData.bio || '';
 			
@@ -300,7 +305,7 @@ async function loadUserProfile() {
 			// If user document doesn't exist, populate with default values
 			if (profileImage) profileImage.src = currentUser.photoURL || 'assets/placeholderImage.jpg';
 			if (displayNameInput) displayNameInput.value = currentUser.displayName || '';
-			if (usernameInput) usernameInput.value = currentUser.email;
+			if (usernameInput) usernameInput.value = generateUsernameFromEmail(currentUser.email);
 			if (emailInput) emailInput.value = currentUser.email;
 			if (bioInput) bioInput.value = "Hey there! I'm using IITGN blogs";
 			
@@ -323,66 +328,222 @@ async function loadUserProfile() {
 }
 
 function setupProfileEventListeners() {
-	const saveAllBtn = document.getElementById('saveAllBtn');
+	console.log("Setting up profile event listeners...");
+	
+	// Setup edit/save/cancel functionality for editable fields
+	setupEditableFields();
+}
 
-	// Save all changes at once
-	if (saveAllBtn) {
-		saveAllBtn.addEventListener('click', async () => {
-			try {
-				console.log("Save All button clicked!");
-				showLoading(true);
+function setupEditableFields() {
+	const editButtons = document.querySelectorAll('.edit-btn');
+	const saveButtons = document.querySelectorAll('.save-btn');
+	const cancelButtons = document.querySelectorAll('.cancel-btn');
+	
+	// Store original values for cancel functionality
+	const originalValues = {};
+	
+	editButtons.forEach(button => {
+		button.addEventListener('click', (e) => {
+			const fieldName = e.target.dataset.field;
+			const input = document.getElementById(fieldName);
+			const editBtn = document.querySelector(`[data-field="${fieldName}"].edit-btn`);
+			const saveBtn = document.querySelector(`[data-field="${fieldName}"].save-btn`);
+			const cancelBtn = document.querySelector(`[data-field="${fieldName}"].cancel-btn`);
+			
+			if (input && editBtn && saveBtn && cancelBtn) {
+				// Store original value
+				originalValues[fieldName] = input.value;
 				
-				const bioInput = document.getElementById('bio');
+				// Enable input and change styling
+				input.readOnly = false;
+				input.classList.add('editing');
+				input.focus();
 				
-				const updateData = {
-					bio: bioInput ? bioInput.value : '',
-					email: currentUser.email
+				// Add keyboard event listeners
+				const handleKeydown = (e) => {
+					if (e.key === 'Enter') {
+						e.preventDefault();
+						saveField(fieldName);
+					} else if (e.key === 'Escape') {
+						e.preventDefault();
+						cancelEdit(fieldName, originalValues[fieldName]);
+					}
 				};
 				
-				console.log("Update data:", updateData);
-				console.log("User doc ID:", userDocId);
+				input.addEventListener('keydown', handleKeydown);
 				
-				if (userDocId) {
-					// Update existing document
-					console.log("Updating existing user document...");
-					await updateDoc(doc(db, 'authors', userDocId), updateData);
-				} else {
-					// Create new document - include current user's displayName, username, and imageUrl from auth
-					console.log("Creating new user document...");
-					const displayNameInput = document.getElementById('displayName');
-					const usernameInput = document.getElementById('username');
-					const profileImage = document.getElementById('profileImage');
-					
-					const newUserData = {
-						...updateData,
-						displayName: displayNameInput ? displayNameInput.value : '',
-						username: usernameInput ? usernameInput.value : '',
-						imageUrl: profileImage ? profileImage.src : ''
-					};
-					
-					const docRef = await addDoc(collection(db, 'authors'), newUserData);
-					userDocId = docRef.id;
-					console.log("New document created with ID:", userDocId);
-				}
+				// Store the event listener for cleanup
+				input._handleKeydown = handleKeydown;
 				
-				// No need to update Firebase Auth profile since no changes are allowed
-				console.log("Profile save completed - only bio updated!");
-				
-				showNotification('Profile updated successfully!', 'success');
-				
-				console.log("Profile save completed successfully!");
-				
-			} catch (error) {
-				console.error('Error updating profile:', error);
-				showNotification('Error updating profile: ' + error.message, 'error');
-			} finally {
-				showLoading(false);
+				// Toggle button visibility
+				editBtn.style.display = 'none';
+				saveBtn.style.display = 'block';
+				cancelBtn.style.display = 'block';
 			}
 		});
-		console.log("Save All button event listener attached successfully!");
-	} else {
-		console.log("Save All button not found!");
+	});
+	
+	saveButtons.forEach(button => {
+		button.addEventListener('click', async (e) => {
+			const fieldName = e.target.dataset.field;
+			await saveField(fieldName);
+		});
+	});
+	
+	cancelButtons.forEach(button => {
+		button.addEventListener('click', (e) => {
+			const fieldName = e.target.dataset.field;
+			cancelEdit(fieldName, originalValues[fieldName]);
+		});
+	});
+}
+
+async function saveField(fieldName) {
+	try {
+		const input = document.getElementById(fieldName);
+		const editBtn = document.querySelector(`[data-field="${fieldName}"].edit-btn`);
+		const saveBtn = document.querySelector(`[data-field="${fieldName}"].save-btn`);
+		const cancelBtn = document.querySelector(`[data-field="${fieldName}"].cancel-btn`);
+		
+		if (!input) {
+			throw new Error('Input field not found');
+		}
+		
+		// Disable buttons during save
+		if (saveBtn) saveBtn.disabled = true;
+		if (cancelBtn) cancelBtn.disabled = true;
+		
+		showLoading(true);
+		
+		const newValue = input.value.trim();
+		if (!newValue) {
+			throw new Error('Field cannot be empty');
+		}
+		
+		// Additional validation for username
+		if (fieldName === 'username') {
+			// Check if username contains only allowed characters
+			if (!/^[a-zA-Z0-9_-]+$/.test(newValue)) {
+				throw new Error('Username can only contain letters, numbers, hyphens, and underscores');
+			}
+			
+			// Check if username is too short
+			if (newValue.length < 3) {
+				throw new Error('Username must be at least 3 characters long');
+			}
+			
+			// Check if username already exists (excluding current user)
+			const usernameQuery = query(collection(db, 'authors'), where('username', '==', newValue));
+			const usernameSnapshot = await getDocs(usernameQuery);
+			
+			if (!usernameSnapshot.empty) {
+				// Check if the existing username belongs to the current user
+				const existingUser = usernameSnapshot.docs[0];
+				if (existingUser.id !== userDocId) {
+					throw new Error('This username is already taken. Please choose another one.');
+				}
+			}
+		}
+		
+		// Prepare update data
+		const updateData = {};
+		updateData[fieldName] = newValue;
+		
+		console.log(`Saving ${fieldName} with value:`, newValue);
+		console.log("User doc ID:", userDocId);
+		
+		if (userDocId) {
+			// Update existing document
+			await updateDoc(doc(db, 'authors', userDocId), updateData);
+		} else {
+			// Create new document if it doesn't exist
+			const displayNameInput = document.getElementById('displayName');
+			const usernameInput = document.getElementById('username');
+			const profileImage = document.getElementById('profileImage');
+			
+			const newUserData = {
+				email: currentUser.email,
+				displayName: displayNameInput ? displayNameInput.value : currentUser.displayName || '',
+				username: usernameInput ? usernameInput.value : generateUsernameFromEmail(currentUser.email),
+				imageUrl: profileImage ? profileImage.src : currentUser.photoURL || '',
+				bio: "Hey there! I'm using IITGN blogs",
+				...updateData
+			};
+			
+			const docRef = await addDoc(collection(db, 'authors'), newUserData);
+			userDocId = docRef.id;
+			console.log("New document created with ID:", userDocId);
+		}
+		
+		// Update UI back to read-only state
+		input.readOnly = true;
+		input.classList.remove('editing');
+		
+		// Clean up keyboard event listener
+		if (input._handleKeydown) {
+			input.removeEventListener('keydown', input._handleKeydown);
+			delete input._handleKeydown;
+		}
+		
+		// Toggle button visibility and re-enable them
+		if (editBtn && saveBtn && cancelBtn) {
+			editBtn.style.display = 'block';
+			saveBtn.style.display = 'none';
+			cancelBtn.style.display = 'none';
+			saveBtn.disabled = false;
+			cancelBtn.disabled = false;
+		}
+		
+		showNotification(`${fieldName === 'displayName' ? 'Name' : 'Username'} updated successfully!`, 'success');
+		console.log(`${fieldName} saved successfully!`);
+		
+	} catch (error) {
+		console.error(`Error saving ${fieldName}:`, error);
+		showNotification(`Error updating ${fieldName === 'displayName' ? 'name' : 'username'}: ${error.message}`, 'error');
+		
+		// Re-enable buttons on error
+		const saveBtn = document.querySelector(`[data-field="${fieldName}"].save-btn`);
+		const cancelBtn = document.querySelector(`[data-field="${fieldName}"].cancel-btn`);
+		if (saveBtn) saveBtn.disabled = false;
+		if (cancelBtn) cancelBtn.disabled = false;
+		
+	} finally {
+		showLoading(false);
 	}
+}
+
+function cancelEdit(fieldName, originalValue) {
+	const input = document.getElementById(fieldName);
+	const editBtn = document.querySelector(`[data-field="${fieldName}"].edit-btn`);
+	const saveBtn = document.querySelector(`[data-field="${fieldName}"].save-btn`);
+	const cancelBtn = document.querySelector(`[data-field="${fieldName}"].cancel-btn`);
+	
+	if (input && editBtn && saveBtn && cancelBtn) {
+		// Restore original value
+		input.value = originalValue || '';
+		
+		// Disable input and remove styling
+		input.readOnly = true;
+		input.classList.remove('editing');
+		
+		// Clean up keyboard event listener
+		if (input._handleKeydown) {
+			input.removeEventListener('keydown', input._handleKeydown);
+			delete input._handleKeydown;
+		}
+		
+		// Toggle button visibility
+		editBtn.style.display = 'block';
+		saveBtn.style.display = 'none';
+		cancelBtn.style.display = 'none';
+	}
+}
+
+// Helper function to generate username from email
+function generateUsernameFromEmail(email) {
+	if (!email) return '';
+	// Extract the part before @ and remove dots and special characters
+	return email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 }
 
 // Utility functions
