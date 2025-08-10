@@ -110,6 +110,11 @@ auth.onAuthStateChanged((user) => {
 
 
 
+		// Load author profile data if on author page
+		if (window.location.pathname.includes('author.html')) {
+			loadAuthorProfile();
+		}
+
 	} else {
 		// User is signed out.
 		console.log("No user signed in.");
@@ -141,5 +146,6 @@ function signOutWithGoogle() {
 function goToProfile() {
 	window.location.href = 'profile.html'
 }
+
 
 export default auth
