@@ -38,12 +38,21 @@ function renderBlog(doc) {
   const truncatedSubline = truncateText(subline);
   const imageUrl = docData.imageUrl || './assets/placeholderImage.jpg'; // Use uploaded image or placeholder
 
+  
+  // Create author link if author email is available
+  const authorEmail = docData.authorEmail;
+  const authorName = docData.author || 'Unknown Author';
+  const authorSection = authorEmail 
+    ? `<p class="blog-author">By <a href="author.html?email=${encodeURIComponent(authorEmail)}" class="author-link" onclick="event.stopPropagation();" title="View ${authorName}'s profile">${authorName}</a></p>`
+    : `<p class="blog-author">By ${authorName}</p>`;
+  
   const blogHTML = `
     <a class="blog" id="${doc.id}" href="viewBlog.html?blogId=${docData.blogId}">
       <img class="blogImage" src="${imageUrl}" alt="${docData.title}">
       <div class="blog-content">
         <h3>${title}</h3>
         <p>${truncatedSubline}</p>
+        ${authorSection}
       </div>
     </a>`;
   
